@@ -29,8 +29,6 @@ http.interceptors.response.use(response => { /* 请求之后拦截器。可以�
   // if (response.data.code !== 200) { // 服务端返回的状态码不等于200，则reject()
   //   return Promise.reject(response)
   // }
-
-
   return response
 }, response => { // 请求错误做点什么。可以使用async await 做异步操作
   console.log(response)
