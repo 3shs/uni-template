@@ -1,10 +1,11 @@
 <template>
   <view class="main-page--container">
-    <view class="star-capital-title">STAR CAPITAL</view>
+    <ScTitle :customStyle="{marginBottom: '30rpx'}"></ScTitle>
     <ScCard
       :title="item.tradeStrategy.type"
       v-for="(item, index) in strategyList"
-      :key="index">
+      :key="index"
+      @click="onclick(item)">
         <template #subHeader>
           <TnTag
             :type="item.tradeStrategy.status === 'ENABLE' ? 'success' : 'danger'"
@@ -21,7 +22,6 @@
         </template>
     </ScCard>
   </view>
-
 </template>
 
 
@@ -31,6 +31,7 @@ import { onShow } from "@dcloudio/uni-app"
 import { getTradeStrategyList } from "@/api/trade"
 import TnTag from '@tuniao/tnui-vue3-uniapp/components/tag/src/tag.vue'
 import ScCard from '../../components/ScCard/index.vue'
+import ScTitle from '../../components/ScTitle/index.vue'
 
 interface TradeStrategy {
   type: string,
@@ -82,28 +83,13 @@ const getContent = computed(() => {
   }
 })
 
+const onclick = (row: Strategy) => {
+  console.log(row)
+}
+
 </script>
 
 <style lang="scss" scoped>
-.star-capital-title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #300A0C;
-  margin-bottom: 30rpx;
-  position: relative;
-  &::before {
-    content: '';
-    position: absolute;
-    left: -4px;
-    top: 0px;
-    width: 30rpx;
-    height: 30rpx;
-    background: #FFC1C4;
-    border-radius: 50%;
-    opacity: 0.5;
-  }
-}
-
 .sc-card-content-label-value {
   display: flex;
   align-items: center;

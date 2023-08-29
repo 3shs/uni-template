@@ -13,6 +13,19 @@
 			}
 		}
 	],
+  "subpackages": [
+    {
+      "root": "subPages",
+      "pages": [
+        {
+          "path": "order/index",
+          "style": {
+            "navigationBarTitleText": "订单"
+          }
+        }
+      ]
+    }
+  ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",

@@ -1,6 +1,7 @@
 <template>
   <view
-    class="sc-card">
+    class="sc-card"
+    @click="onClikcCard">
     <view class="sc-card-title">
       <view class="left">
         {{ title }}
@@ -19,6 +20,11 @@ const props = defineProps({
   title: String
 })
 
+const emit = defineEmits(['click'])
+
+const onClikcCard = () => {
+  emit('click')
+}
 </script>
 <style lang="scss" scoped>
 .sc-card {

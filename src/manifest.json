@@ -57,7 +57,10 @@
             "minified" : false,
             "postcss" : false
         },
-        "usingComponents" : true
+        "usingComponents" : true,
+        "optimization": {
+          "subPackages": true
+        }
     },
     "mp-alipay" : {
         "usingComponents" : true
