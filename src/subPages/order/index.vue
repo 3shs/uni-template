@@ -15,34 +15,30 @@
 <script setup lang="ts">
 import { onShow } from "@dcloudio/uni-app"
 import { ref, computed } from 'vue'
-import { getOrderList } from '../../api/order'
+import { getOrderList } from '@/api/sc-api'
 
-const orderList = ref([
-  {
-    strategyType: 'CYR',
-    orderType: 'OPEN'
-  },
-  {
-    strategyType: 'CYR',
-    orderType: 'PROFIT'
-  },
-  {
-    strategyType: 'CYR',
-    orderType: 'STOP'
-  }
-])
+interface Order {
+  strategyType: string,
+  orderType: string
+}
 
-onShow(async () => {
-  // const res = await getOrderList()
-  // console.log(res)
+const orderList = ref<Order[]>([])
+
+onShow(() => {
+  getOrders()
 })
+
+const getOrders = async () => {
+  const { records } = await getOrderList() as any
+  orderList.value = records
+}
 
 const getClass = computed(() => {
   return (type: string) => {
     if (type === 'PROFIT') {
-      return 'success'
+      return 'sc-success'
     } else if (type === 'STOP') {
-      return 'danger'
+      return 'sc-danger'
     }
   }
 })

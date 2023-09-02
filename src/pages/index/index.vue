@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { onShow } from "@dcloudio/uni-app"
-import { getTradeStrategyList } from "@/api/trade"
+import { getTradeStrategyList } from "@/api/sc-api"
 import TnTag from '@tuniao/tnui-vue3-uniapp/components/tag/src/tag.vue'
 import ScCard from '../../components/ScCard/index.vue'
 import ScTitle from '../../components/ScTitle/index.vue'
@@ -51,7 +51,7 @@ interface Row {
 }
 const strategyList = ref<Strategy[]>([])
 onShow(async ()=> {
-  const { data } = await getTradeStrategyList()
+  const data = await getTradeStrategyList() as any
   strategyList.value = data
 })
 
