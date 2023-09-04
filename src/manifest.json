@@ -58,9 +58,10 @@
             "postcss" : false
         },
         "usingComponents" : true,
-        "optimization": {
-          "subPackages": true
-        }
+        "optimization" : {
+            "subPackages" : true
+        },
+        "permission" : {}
     },
     "mp-alipay" : {
         "usingComponents" : true

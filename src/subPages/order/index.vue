@@ -3,10 +3,20 @@
     <view class="order-card-container">
       <view
         class="order-card"
-        v-for="(item, index) in orderList">
+        v-for="(item, index) in orderList"
+        @click="onClickOrder(item)">
         <view class="top flex-c-b f-w-500">
-          <view class="left">{{ item.strategyType }}</view>
+          <view class="left">{{ getType(item.strategyType )}}</view>
           <view :class="['right', getClass(item.orderType)]">{{ getOrderType(item.orderType) }}</view>
+        </view>
+        <view class="bottom">
+          <view
+            class="sub-itm flex-a-c"
+            v-for="(ele, i) in getContent(item)"
+            :key="index">
+            <view class="label">{{ ele.label }}</view>
+            <view class="value">{{ ele.value }}</view>
+          </view>
         </view>
       </view>
     </view>
@@ -19,7 +29,10 @@ import { getOrderList } from '@/api/sc-api'
 
 interface Order {
   strategyType: string,
-  orderType: string
+  orderType: string,
+  instId: string,
+  lever: string,
+  ordId: string
 }
 
 const orderList = ref<Order[]>([])
@@ -55,6 +68,39 @@ const getOrderType = computed(() => {
   }
 })
 
+const getType = computed(() => {
+  return (type: string) => {
+    if (type === 'CYR') {
+      return '波段'
+    } else if (type === 'FDM') {
+      return '突破'
+    } else {
+      return '箱体'
+    }
+  }
+})
+
+const getContent = computed(() => {
+  return (row: Order) => {
+    return [
+      {
+        label: '币种',
+        value: row.instId ? row.instId : '-'
+      },
+      {
+        label: '订单号',
+        value: row.ordId ? row.ordId : '-'
+      }
+    ]
+  }
+})
+
+const onClickOrder = (row: Order) => {
+  const info = JSON.stringify(row)
+  uni.navigateTo({
+    url: `/subPages/orderDetail/index?info=${info}`
+  })
+}
 </script>
 <style lang="scss" scoped>
   .order-card-container {
@@ -65,6 +111,13 @@ const getOrderType = computed(() => {
         .top {
           color: #020202;
           font-size: 30rpx;
+        }
+        .sub-itm {
+          color: $sc-sub-font-color;
+          font-size: 24rpx;
+          .label {
+            width: 118rpx;
+          }
         }
       }
   }

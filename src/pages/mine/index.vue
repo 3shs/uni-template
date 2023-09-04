@@ -2,7 +2,7 @@
   <view class="main-page--container">
     <view class="property-container">
       <view class="title">总资产估值</view>
-      <view class="amount">51.88</view>
+      <view class="amount">9999.88</view>
     </view>
     <view class="nav-container">
       <view

@@ -2,14 +2,15 @@
   <view class="main-page--container">
     <ScTitle :customStyle="{marginBottom: '30rpx'}"></ScTitle>
     <ScCard
-      :title="item.tradeStrategy.type"
-      v-for="(item, index) in strategyList"
+      :title="item.name"
+      v-for="(item, index) in accountList"
       :key="index"
       @click="onclick(item)">
         <template #subHeader>
           <TnTag
-            :type="item.tradeStrategy.status === 'ENABLE' ? 'success' : 'danger'"
-            shape="round">{{ item.tradeStrategy.status === 'ENABLE' ? '启用' : '停用' }}</TnTag>
+            :type="item.status === 'ENABLE' ? 'success' : 'danger'"
+            :bg-color="`${item.status === 'ENABLE' ? '#62bc6e' : '#e6517b'}`"
+            shape="round">{{ item.status === 'ENABLE' ? '启用' : '停用' }}</TnTag>
         </template>
         <template #content>
           <view
@@ -28,63 +29,39 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { onShow } from "@dcloudio/uni-app"
-import { getTradeStrategyList } from "@/api/sc-api"
+import { getAccountList } from "@/api/sc-api"
 import TnTag from '@tuniao/tnui-vue3-uniapp/components/tag/src/tag.vue'
 import ScCard from '../../components/ScCard/index.vue'
 import ScTitle from '../../components/ScTitle/index.vue'
 
-interface TradeStrategy {
-  type: string,
-  status: string,
-  instId: string,
-  posSide: string,
-  operateAmount: string,
-  updatedTime: string,
-  closeCount: number
+interface Account {
+  id: string,
+  apiKey: string,
+  name: string,
+  status: string
 }
-interface Strategy {
-  tradeIntervalList: [],
-  tradeStrategy: TradeStrategy
-}
-interface Row {
-  tradeStrategy: TradeStrategy
-}
-const strategyList = ref<Strategy[]>([])
+
+const accountList = ref<Account[]>([])
 onShow(async ()=> {
-  const data = await getTradeStrategyList() as any
-  strategyList.value = data
+  const data = await getAccountList() as any
+  accountList.value = data
 })
 
 const getContent = computed(() => {
-
-  return (row: Row) => {
+  return (row: Account) => {
     return [
       {
-        label: '币种',
-        value: row.tradeStrategy.instId
-      },
-      {
-        label: '持仓方向',
-        value: row.tradeStrategy.posSide === 'short' ? '做空' : '做多'
-      },
-      {
-        label: '开仓金额',
-        value: row.tradeStrategy.operateAmount ? row.tradeStrategy.operateAmount : '-'
-      },
-      {
-        label: '更新时间',
-        value: row.tradeStrategy.updatedTime
-      },
-      {
-        label: '分批止损次数',
-        value: row.tradeStrategy.closeCount
+        label: 'ApiKey',
+        value: row.apiKey
       }
     ]
   }
 })
 
-const onclick = (row: Strategy) => {
-  console.log(row)
+const onclick = (row: Account) => {
+  uni.navigateTo({
+    url: `/subPages/accountMenu/index?id=${row.id}&title=${row.name}`
+  })
 }
 
 </script>
@@ -100,9 +77,9 @@ const onclick = (row: Strategy) => {
     color: #300A0C;
   }
   .value {
-    font-size: 28rpx;
+    font-size: 24rpx;
     font-weight: 400;
-    color: #666666;
+    color: $sc-sub-font-color
   }
 }
 </style>

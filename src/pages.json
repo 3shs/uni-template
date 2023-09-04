@@ -22,6 +22,42 @@
           "style": {
             "navigationBarTitleText": "订单"
           }
+        },
+        {
+          "path": "strategy/index",
+          "style": {
+            "navigationBarTitleText": "策略"
+          }
+        },
+        {
+          "path": "addStrategy/index",
+          "style": {
+            "navigationBarTitleText": "配置策略"
+          }
+        },
+        {
+          "path": "accountMenu/index",
+          "style": {
+            "navigationBarTitleText": "功能"
+          }
+        },
+        {
+          "path": "leverage/index",
+          "style": {
+            "navigationBarTitleText": "杠杆"
+          }
+        },
+        {
+          "path": "addLeverage/index",
+          "style": {
+            "navigationBarTitleText": "配置杠杆"
+          }
+        },
+        {
+          "path": "orderDetail/index",
+          "style": {
+            "navigationBarTitleText": "订单详情"
+          }
         }
       ]
     }
