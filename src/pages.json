@@ -58,6 +58,12 @@
           "style": {
             "navigationBarTitleText": "订单详情"
           }
+        },
+        {
+          "path": "strategyDetail/index",
+          "style": {
+            "navigationBarTitleText": "策略详情"
+          }
         }
       ]
     }

@@ -40,6 +40,7 @@ import { getTradeStrategyList } from "@/api/sc-api"
 import TnTag from '@tuniao/tnui-vue3-uniapp/components/tag/src/tag.vue'
 import ScCard from '@/components/ScCard/index.vue'
 import ScTitle from '@/components/ScTitle/index.vue'
+import { formatEum } from "@/lib/utils"
 
 interface TradeStrategy {
   type: string,
@@ -82,7 +83,7 @@ const getContent = computed(() => {
       },
       {
         label: '持仓方向',
-        value: row.tradeStrategy.posSide === 'short' ? '做空' : '做多'
+        value: formatEum(row.tradeStrategy.posSide as any)
       },
       {
         label: '开仓金额',
@@ -94,7 +95,7 @@ const getContent = computed(() => {
       },
       {
         label: '分批止损次数',
-        value: row.tradeStrategy.closeCount
+        value: row.tradeStrategy.closeCount ? row.tradeStrategy.closeCount : '-'
       }
     ]
   }
@@ -120,6 +121,10 @@ const onClickAdd = () => {
 
 const onclickRow = (row: Strategy) => {
   console.log(row)
+  const info = JSON.stringify(row)
+  uni.navigateTo({
+    url: `/subPages/strategyDetail/index?accountId=${accountId.value}&info=${info}`
+  })
 }
 
 </script>

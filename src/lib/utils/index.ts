@@ -1,5 +1,10 @@
-export function debounce(func, wait, immediate) {
-  let timeout
+export function debounce(
+  func: Function,
+  wait: number,
+  immediate: boolean
+  )
+  {
+  let timeout: any
   return function () {
     // 保存this 解决this指向问题
     let ctx = this
@@ -19,4 +24,28 @@ export function debounce(func, wait, immediate) {
         }, wait)
     }
   }
+}
+
+interface ScEum {
+  CYR: string
+  FDM: string
+  HYM: string
+  long: string
+  short: string
+  ENABLE: string
+  UNABLE: string
+}
+
+const SC_EUM: ScEum = {
+  CYR: '波段',
+  FDM: '突破',
+  HYM: '箱体',
+  long: '做多',
+  short: '做空',
+  ENABLE: '启用',
+  UNABLE: '停用'
+}
+
+export function formatEum(type: keyof ScEum) {
+  return SC_EUM[type]
 }

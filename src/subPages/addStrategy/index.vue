@@ -121,8 +121,12 @@
             v-for="(ele, i) in intervalForm.open"
             :key="i">
             <view class="left">
+              <view class="fdm-tip flex-a-c" v-if="isFDM">
+                <view class="tip-left">突破线</view>
+                <view class="tip-right">输入价</view>
+              </view>
               <view class="interval flex-c-b">
-                <view class="label">开仓区间</view>
+                <view class="label">{{ isFDM ? '开仓价格' : '开仓区间' }}</view>
                 <view class="value flex-a-c">
                   <TnInput
                     size="sm"
@@ -132,7 +136,7 @@
                       width: '180rpx'
                     }">
                   </TnInput>
-                  <text class="line">-</text>
+                  <text class="line">{{isFDM ? '' : '-'}}</text>
                   <TnInput
                     size="sm"
                     v-model="ele.end"
@@ -250,7 +254,7 @@
           border: '1px solid #e6e6e6',
           borderRadius: '15rpx'
         }"
-        title="止损">
+        :title="isFDM ? '止损50%' : '止损'">
         <template #subHeader>
           <text
             class="iconfont icon-zengjia1 sc-danger"
@@ -315,6 +319,78 @@
         </template>
       </ScCard>
       <template v-if="isFDM">
+        <ScCard
+          :custom-style="{
+            boxShadow: 'none',
+            border: '1px solid #e6e6e6',
+            borderRadius: '15rpx'
+          }"
+          title="全仓止损">
+          <template #subHeader>
+            <text
+              class="iconfont icon-zengjia1 sc-danger"
+              @click="onClickAdd('FDM')">
+            </text>
+          </template>
+          <template #content>
+            <view
+              class="sc-card-content-label-value flex-c-b"
+              v-for="(ele, i) in intervalForm.fdm"
+              :key="i">
+              <view class="left">
+                <view class="interval flex-c-b">
+                  <view class="label">止损区间</view>
+                  <view class="value flex-a-c">
+                    <TnInput
+                      size="sm"
+                      v-model="ele.start"
+                      :placeholder="`${isFDM ? `手动输入价格` : `请输入`}`"
+                      :custom-style="{
+                        width: '180rpx'
+                      }">
+                    </TnInput>
+                    <text
+                      class="line"
+                      v-if="!isFDM">-</text>
+                    <TnInput
+                      size="sm"
+                      v-model="ele.end"
+                      placeholder="请输入"
+                      v-if="!isFDM"
+                      :custom-style="{
+                        width: '180rpx'
+                      }">
+                    </TnInput>
+                  </view>
+                </view>
+                <view class="pos-side flex-c-b" v-if="isFDM">
+                  <view class="label">止损方向</view>
+                  <view class="value">
+                    <TnRadioGroup
+                      v-model="ele.posSide">
+                      <TnRadio label="long" active-color="#62bc6e">做多</TnRadio>
+                      <TnRadio
+                        label="short"
+                        active-color="#e6517b"
+                        :custom-style="{marginRight: '0'}">做空</TnRadio>
+                    </TnRadioGroup>
+                  </view>
+                </view>
+              </view>
+              <view class="right">
+                <TnIcon
+                  name="reduce-circle"
+                  type="danger"
+                  size="40"
+                  :custom-style="{
+                    marginLeft: '8rpx'
+                  }"
+                  @click="onClickRmove('fdm', i)">
+                </TnIcon>
+              </view>
+            </view>
+          </template>
+        </ScCard>
         <ScCard
           :custom-style="{
             boxShadow: 'none',
@@ -459,78 +535,6 @@
             </view>
           </template>
         </ScCard>
-        <ScCard
-          :custom-style="{
-            boxShadow: 'none',
-            border: '1px solid #e6e6e6',
-            borderRadius: '15rpx'
-          }"
-          title="全仓止损">
-          <template #subHeader>
-            <text
-              class="iconfont icon-zengjia1 sc-danger"
-              @click="onClickAdd('FDM')">
-            </text>
-          </template>
-          <template #content>
-            <view
-              class="sc-card-content-label-value flex-c-b"
-              v-for="(ele, i) in intervalForm.fdm"
-              :key="i">
-              <view class="left">
-                <view class="interval flex-c-b">
-                  <view class="label">止损区间</view>
-                  <view class="value flex-a-c">
-                    <TnInput
-                      size="sm"
-                      v-model="ele.start"
-                      :placeholder="`${isFDM ? `手动输入价格` : `请输入`}`"
-                      :custom-style="{
-                        width: '180rpx'
-                      }">
-                    </TnInput>
-                    <text
-                      class="line"
-                      v-if="!isFDM">-</text>
-                    <TnInput
-                      size="sm"
-                      v-model="ele.end"
-                      placeholder="请输入"
-                      v-if="!isFDM"
-                      :custom-style="{
-                        width: '180rpx'
-                      }">
-                    </TnInput>
-                  </view>
-                </view>
-                <view class="pos-side flex-c-b" v-if="isFDM">
-                  <view class="label">止损方向</view>
-                  <view class="value">
-                    <TnRadioGroup
-                      v-model="ele.posSide">
-                      <TnRadio label="long" active-color="#62bc6e">做多</TnRadio>
-                      <TnRadio
-                        label="short"
-                        active-color="#e6517b"
-                        :custom-style="{marginRight: '0'}">做空</TnRadio>
-                    </TnRadioGroup>
-                  </view>
-                </view>
-              </view>
-              <view class="right">
-                <TnIcon
-                  name="reduce-circle"
-                  type="danger"
-                  size="40"
-                  :custom-style="{
-                    marginLeft: '8rpx'
-                  }"
-                  @click="onClickRmove('fdm', i)">
-                </TnIcon>
-              </view>
-            </view>
-          </template>
-        </ScCard>
       </template>
 
     </view>
@@ -627,12 +631,18 @@ const accountId = ref('')
 onLoad((opt) => {
   accountId.value = opt?.accountId
   formData.acctId = opt?.accountId
+  if (opt?.info) {
+    assignFormData(JSON.parse(opt.info))
+  } else {
+    formData.id = ''
+  }
 })
 onShow(() => {
   getOperateAmount()
   getCurrencys()
 })
 const formData = reactive({
+  id: '',
   type: 'CYR',
   instId: '',
   posSide: '',
@@ -786,6 +796,27 @@ const onChangeType = (value: string) => {
   intervalForm.fdm = [{ type: 'FDM', start: '', end: '', posSide: '' }]
 }
 
+const assignFormData = (data: any) => {
+  console.log(data)
+  formData.id = data.tradeStrategy.id
+  formData.type = data.tradeStrategy.type
+  formData.instId = data.tradeStrategy.instId
+  formData.posSide = data.tradeStrategy.posSide
+  formData.status = data.tradeStrategy.status
+  formData.closeCount = data.tradeStrategy.closeCount
+  formData.operateAmount = data.tradeStrategy.operateAmount
+  formData.rate = data.tradeStrategy.rate
+  formData.k = data.tradeStrategy.k
+  formData.back = data.tradeStrategy.back
+  formData.acctId = data.tradeStrategy.acctId
+  intervalForm.open = data.open
+  intervalForm.profit = data.profit
+  intervalForm.stop = data.stop
+  intervalForm.backProfit = data.backProfit
+  intervalForm.backStop = data.backStop
+  intervalForm.fdm = data.fdm
+}
+
 const onClickSave = debounce(async() => {
   await formRef.value?.validate()
   const res = await createStrategy(formData) as any
@@ -833,6 +864,15 @@ const onClickSave = debounce(async() => {
     .line {
       margin: 0 4rpx;
     }
+  }
+}
+.fdm-tip {
+  color: $sc-sub-font-color;
+  font-size: 22rpx;
+  justify-content: flex-end;
+  .tip-right {
+    margin-left: 123rpx;
+    margin-right: 103rpx;
   }
 }
 </style>

@@ -28,11 +28,13 @@ import { ref, computed } from 'vue'
 import { getOrderList } from '@/api/sc-api'
 
 interface Order {
-  strategyType: string,
-  orderType: string,
-  instId: string,
-  lever: string,
+  strategyType: string
+  orderType: string
+  instId: string
+  lever: string
   ordId: string
+  px: string
+  sz: string
 }
 
 const orderList = ref<Order[]>([])
@@ -88,8 +90,16 @@ const getContent = computed(() => {
         value: row.instId ? row.instId : '-'
       },
       {
+        label: '成交价',
+        value: row.px ? row.px : '-'
+      },
+      {
         label: '订单号',
         value: row.ordId ? row.ordId : '-'
+      },
+      {
+        label: '成交数量',
+        value: row.sz ? row.sz : '-'
       }
     ]
   }

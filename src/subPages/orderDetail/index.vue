@@ -84,7 +84,6 @@ const info = ref<Info>({
 })
 onLoad((opt) => {
   info.value = JSON.parse(opt?.info)
-  console.log(info)
 })
 
 const getType = computed(() => {
@@ -187,7 +186,7 @@ const getContent = computed(() => {
 })
 
 const getRelatContent = computed(() => {
-  return (row) => {
+  return (row: Info) => {
     return [
       {
         label: '费用',
