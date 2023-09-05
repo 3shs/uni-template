@@ -120,7 +120,6 @@ const onClickAdd = () => {
 }
 
 const onclickRow = (row: Strategy) => {
-  console.log(row)
   const info = JSON.stringify(row)
   uni.navigateTo({
     url: `/subPages/strategyDetail/index?accountId=${accountId.value}&info=${info}`

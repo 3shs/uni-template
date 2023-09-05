@@ -26,11 +26,11 @@
             :key="i">
             <view class="left">
               <view class="interval flex-c-b">
-                <view class="label">开仓区间</view>
+                <view class="label">{{ isFDM ? '开仓价格' : '开仓区间' }}</view>
                 <view class="value flex-a-c">
-                  <text>{{ ele.start }}</text>
-                  <text class="line">-</text>
-                  <text>{{ ele.end }}</text>
+                  <text> <text v-if="isFDM">突破线</text> {{ ele.start }}</text>
+                  <text class="line">{{isFDM ? '' : '-'}}</text>
+                  <text> <text v-if="isFDM">输入价</text> {{ ele.end }}</text>
                 </view>
               </view>
               <view class="pos-side flex-c-b" v-if="isFDM">

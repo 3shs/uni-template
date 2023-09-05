@@ -7,6 +7,7 @@ export function debounce(
   let timeout: any
   return function () {
     // 保存this 解决this指向问题
+    // @ts-ignore TODO
     let ctx = this
     // 保存事件对象
     let args = arguments
