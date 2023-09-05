@@ -117,10 +117,13 @@ const onClickOrder = (row: Order) => {
       .order-card {
         width: 100%;
         border-bottom: 1px solid #f3f2f3;
-        padding: 40rpx 0;
+        padding: 20rpx 0;
         .top {
           color: #020202;
           font-size: 30rpx;
+          .right {
+            color: $sc-btc-color;
+          }
         }
         .sub-itm {
           color: $sc-sub-font-color;
