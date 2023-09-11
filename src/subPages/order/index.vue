@@ -44,8 +44,12 @@ onShow(() => {
 })
 
 const getOrders = async () => {
+  uni.showLoading({
+    title: '加载中...'
+  })
   const { records } = await getOrderList() as any
   orderList.value = records
+  uni.hideLoading()
 }
 
 const getClass = computed(() => {

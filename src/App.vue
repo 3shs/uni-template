@@ -12,5 +12,5 @@ onHide(() => {
 })
 </script>
 <style>
-@import '@tuniao/tn-style/dist/uniapp/index.css';
+@import '@/uni_modules/tuniaoui/index.css';
 </style>

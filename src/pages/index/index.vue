@@ -30,7 +30,7 @@
 import { ref, computed } from 'vue'
 import { onShow } from "@dcloudio/uni-app"
 import { getAccountList } from "@/api/sc-api"
-import TnTag from '@tuniao/tnui-vue3-uniapp/components/tag/src/tag.vue'
+import TnTag from '@/uni_modules/tuniaoui/components/tag/src/tag.vue'
 import ScCard from '../../components/ScCard/index.vue'
 import ScTitle from '../../components/ScTitle/index.vue'
 

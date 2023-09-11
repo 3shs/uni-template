@@ -13,7 +13,7 @@
             v-model="formData.type"
             border
             active-color="#020202"
-            @change="(onChangeType as any)">
+            @change="(onChangeType as Function)">
             <TnRadio label="CYR">波段</TnRadio>
             <TnRadio label="FDM">突破</TnRadio>
             <TnRadio label="HYM">箱体</TnRadio>
@@ -41,6 +41,7 @@
         <TnFormItem label="持仓方向" prop="posSide">
           <TnRadioGroup
             v-model="formData.posSide"
+            @change="(onChangePosSide as Function)"
             border>
             <TnRadio label="long" active-color="#62bc6e">做多</TnRadio>
             <TnRadio label="short" active-color="#e6517b">做空</TnRadio>
@@ -151,6 +152,7 @@
                 <view class="label">开仓方向</view>
                 <view class="value">
                   <TnRadioGroup
+                    disabled
                     v-model="ele.posSide">
                     <TnRadio label="long" active-color="#62bc6e">做多</TnRadio>
                     <TnRadio
@@ -224,6 +226,7 @@
                 <view class="label">止盈方向</view>
                 <view class="value">
                   <TnRadioGroup
+                    disabled
                     v-model="ele.posSide">
                     <TnRadio label="long" active-color="#62bc6e">做多</TnRadio>
                     <TnRadio
@@ -294,6 +297,7 @@
                 <view class="label">止损方向</view>
                 <view class="value">
                   <TnRadioGroup
+                    :disabled="isHYM && formData.posSide === 'long,short' ? false : true"
                     v-model="ele.posSide">
                     <TnRadio label="long" active-color="#62bc6e">做多</TnRadio>
                     <TnRadio
@@ -367,6 +371,7 @@
                   <view class="label">止损方向</view>
                   <view class="value">
                     <TnRadioGroup
+                      disabled
                       v-model="ele.posSide">
                       <TnRadio label="long" active-color="#62bc6e">做多</TnRadio>
                       <TnRadio
@@ -439,6 +444,7 @@
                   <view class="label">止盈方向</view>
                   <view class="value">
                     <TnRadioGroup
+                      disabled
                       v-model="ele.posSide">
                       <TnRadio label="long" active-color="#62bc6e">做多</TnRadio>
                       <TnRadio
@@ -511,6 +517,7 @@
                   <view class="label">止损方向</view>
                   <view class="value">
                     <TnRadioGroup
+                      disabled
                       v-model="ele.posSide">
                       <TnRadio label="long" active-color="#62bc6e">做多</TnRadio>
                       <TnRadio
@@ -569,19 +576,19 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
-import { onShow, onLoad } from "@dcloudio/uni-app"
+import { onShow, onLoad, onUnload } from "@dcloudio/uni-app"
 import { getCurrencyList, getAccountBalance, createStrategy, createInterval } from "@/api/sc-api"
 import ScCard from '../../components/ScCard/index.vue'
 import ScTitle from '@/components/ScTitle/index.vue'
-import TnForm from '@tuniao/tnui-vue3-uniapp/components/form/src/form.vue'
-import TnFormItem from '@tuniao/tnui-vue3-uniapp/components/form/src/form-item.vue'
-import TnInput from '@tuniao/tnui-vue3-uniapp/components/input/src/input.vue'
-import TnPicker from '@tuniao/tnui-vue3-uniapp/components/picker/src/picker.vue'
-import TnRadioGroup from '@tuniao/tnui-vue3-uniapp/components/radio/src/radio-group.vue'
-import TnRadio from '@tuniao/tnui-vue3-uniapp/components/radio/src/radio.vue'
-import TnIcon from '@tuniao/tnui-vue3-uniapp/components/icon/src/icon.vue'
-import TnButton from "@tuniao/tnui-vue3-uniapp/components/button/src/button.vue"
-import type { FormRules, TnFormInstance } from '@tuniao/tnui-vue3-uniapp'
+import TnForm from '@/uni_modules/tuniaoui/components/form/src/form.vue'
+import TnFormItem from '@/uni_modules/tuniaoui/components/form/src/form-item.vue'
+import TnInput from '@/uni_modules/tuniaoui/components/input/src/input.vue'
+import TnPicker from '@/uni_modules/tuniaoui/components/picker/src/picker.vue'
+import TnRadioGroup from '@/uni_modules/tuniaoui/components/radio/src/radio-group.vue'
+import TnRadio from '@/uni_modules/tuniaoui/components/radio/src/radio.vue'
+import TnIcon from '@/uni_modules/tuniaoui/components/icon/src/icon.vue'
+import TnButton from "@/uni_modules/tuniaoui/components/button/src/button.vue"
+import type { FormRules, TnFormInstance } from '@/uni_modules/tuniaoui'
 import { debounce } from "@/lib/utils"
 const formRef = ref<TnFormInstance>()
 const formRules: FormRules = {
@@ -636,6 +643,11 @@ onLoad((opt) => {
   } else {
     formData.id = ''
   }
+})
+let timerId: any
+
+onUnload(() => {
+  timerId = null
 })
 onShow(() => {
   getOperateAmount()
@@ -743,7 +755,7 @@ const onClickAdd = (type: string) => {
     type,
     start: '',
     end: '',
-    posSide: '',
+    posSide: formData.posSide,
   }
   intervalForm[eumType[type]].push(JSON.parse(JSON.stringify(data)))
 }
@@ -817,6 +829,27 @@ const assignFormData = (data: any) => {
   intervalForm.fdm = data.fdm
 }
 
+const onChangePosSide = (val: string) => {
+  if (!isHYM.value) {
+    intervalForm.open[0].posSide = val
+    intervalForm.profit[0].posSide = val
+    intervalForm.stop[0].posSide = val
+    intervalForm.fdm[0].posSide = val
+    intervalForm.backProfit[0].posSide = val === 'long' ? 'short' : 'long'
+    intervalForm.backStop[0].posSide = val === 'long' ? 'short' : 'long'
+  } else {
+    if (val !== 'long,short') {
+      const start = val === 'long' ? '0.98' : '1.02'
+      intervalForm.stop = [{ type: 'STOP', start, end: '', posSide: val }]
+    } else {
+      intervalForm.stop = [
+      { type: 'STOP', start: '0.98', end: '', posSide: 'long' },
+      { type: 'STOP', start: '1.02', end: '', posSide: 'short' },
+    ]
+    }
+  }
+}
+
 const onClickSave = debounce(async() => {
   await formRef.value?.validate()
   const res = await createStrategy(formData) as any
@@ -826,7 +859,7 @@ const onClickSave = debounce(async() => {
     uni.showToast({
       title: '保存成功',
     })
-    setTimeout(() => {
+    timerId = setTimeout(() => {
       uni.hideToast()
       uni.navigateBack({
         delta: 1

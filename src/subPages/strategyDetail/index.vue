@@ -213,15 +213,23 @@
         :bg-color="info.tradeStrategy.status === 'ENABLE' ? '#e6517b' : '#62bc6e'"
         text-color="#ffffff"
         :custom-style="{
-          width: '47%',
+          width: '32%',
           height: '88rpx'
         }"
         @click="onClickStatus">{{info.tradeStrategy.status === 'ENABLE' ? '停 用' : '启 用'}}</TnButton>
       <TnButton
+        bg-color="#ff4d4f"
+        text-color="#ffffff"
+        :custom-style="{
+          width: '32%',
+          height: '88rpx'
+        }"
+        @click="onClickDelete">删除</TnButton>
+      <TnButton
         bg-color="#020202"
         text-color="#ffffff"
         :custom-style="{
-          width: '47%',
+          width: '32%',
           height: '88rpx'
         }"
         @click="onClickEdit">修 改</TnButton>
@@ -230,10 +238,11 @@
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { onLoad } from "@dcloudio/uni-app"
+import { onLoad, onUnload } from "@dcloudio/uni-app"
 import ScTitle from '@/components/ScTitle/index.vue'
 import ScCard from '../../components/ScCard/index.vue'
-import TnButton from "@tuniao/tnui-vue3-uniapp/components/button/src/button.vue"
+import TnButton from "@/uni_modules/tuniaoui/components/button/src/button.vue"
+import { createStrategy, deleteStrategy } from "@/api/sc-api"
 
 import { formatEum } from "@/lib/utils"
 
@@ -270,6 +279,11 @@ const accountId = ref('')
 onLoad((opt) => {
   info.value = JSON.parse( opt?.info)
   accountId.value = opt?.accountId
+})
+let timerId: any
+
+onUnload(() => {
+  timerId = null
 })
 const getContent = computed(() => {
   return [
@@ -311,6 +325,57 @@ const getContent = computed(() => {
     }
   ]
 })
+
+const updateStatus = async () => {
+  const res = await createStrategy({
+    id: info.value.tradeStrategy.id,
+    acctId: info.value.tradeStrategy.acctId,
+    status: info.value.tradeStrategy.status === 'ENABLE' ? 'UNABLE' : 'ENABLE',
+    instId: info.value.tradeStrategy.instId
+  }) as any
+
+  if (res) {
+    uni.showToast({
+      title: '修改成功',
+    })
+    timerId = setTimeout(() => {
+      uni.hideToast()
+      uni.navigateBack({
+        delta: 1
+      })
+    }, 1000)
+  }
+}
+
+const onClickDelete = () => {
+  uni.showModal({
+    title: '提示',
+    content: `确定删除该策略？`,
+    confirmColor: '#020202',
+    cancelColor: '#e6517b',
+    success: function (res) {
+      if (res.confirm) {
+        deleteOneStrategy()
+      }
+    }
+  })
+
+}
+const deleteOneStrategy = async () => {
+  const res = await deleteStrategy(info.value.tradeStrategy.id)
+  console.log(res)
+  if (res) {
+    uni.showToast({
+      title: '删除成功',
+    })
+    timerId = setTimeout(() => {
+      uni.hideToast()
+      uni.navigateBack({
+        delta: 1
+      })
+    }, 1000)
+  }
+}
 const onClickStatus = () => {
   uni.showModal({
     title: '提示',
@@ -319,6 +384,7 @@ const onClickStatus = () => {
     cancelColor: '#e6517b',
     success: function (res) {
       if (res.confirm) {
+        updateStatus()
       }
     }
   })

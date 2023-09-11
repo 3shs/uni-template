@@ -35,6 +35,7 @@ interface ScEum {
   short: string
   ENABLE: string
   UNABLE: string
+  'long,short': string
 }
 
 const SC_EUM: ScEum = {
@@ -44,7 +45,8 @@ const SC_EUM: ScEum = {
   long: '做多',
   short: '做空',
   ENABLE: '启用',
-  UNABLE: '停用'
+  UNABLE: '停用',
+  "long,short": '多空双开'
 }
 
 export function formatEum(type: keyof ScEum) {

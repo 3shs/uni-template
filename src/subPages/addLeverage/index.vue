@@ -54,18 +54,17 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { onShow, onLoad } from "@dcloudio/uni-app"
+import { onShow, onLoad, onUnload } from "@dcloudio/uni-app"
 import { getCurrencyList, createLeverage } from "@/api/sc-api"
-import ScCard from '../../components/ScCard/index.vue'
 import ScTitle from '@/components/ScTitle/index.vue'
-import TnForm from '@tuniao/tnui-vue3-uniapp/components/form/src/form.vue'
-import TnFormItem from '@tuniao/tnui-vue3-uniapp/components/form/src/form-item.vue'
-import TnInput from '@tuniao/tnui-vue3-uniapp/components/input/src/input.vue'
-import TnPicker from '@tuniao/tnui-vue3-uniapp/components/picker/src/picker.vue'
-import TnRadioGroup from '@tuniao/tnui-vue3-uniapp/components/radio/src/radio-group.vue'
-import TnRadio from '@tuniao/tnui-vue3-uniapp/components/radio/src/radio.vue'
-import TnButton from "@tuniao/tnui-vue3-uniapp/components/button/src/button.vue"
-import type { FormRules, TnFormInstance } from '@tuniao/tnui-vue3-uniapp'
+import TnForm from '@/uni_modules/tuniaoui/components/form/src/form.vue'
+import TnFormItem from '@/uni_modules/tuniaoui/components/form/src/form-item.vue'
+import TnInput from '@/uni_modules/tuniaoui/components/input/src/input.vue'
+import TnPicker from '@/uni_modules/tuniaoui/components/picker/src/picker.vue'
+import TnRadioGroup from '@/uni_modules/tuniaoui/components/radio/src/radio-group.vue'
+import TnRadio from '@/uni_modules/tuniaoui/components/radio/src/radio.vue'
+import TnButton from "@/uni_modules/tuniaoui/components/button/src/button.vue"
+import type { FormRules, TnFormInstance } from '@/uni_modules/tuniaoui'
 import { debounce } from "@/lib/utils"
 
 const formRef = ref<TnFormInstance>()
@@ -96,6 +95,11 @@ onShow(() => {
   getCurrencys()
 })
 
+let timerId: any
+
+onUnload(() => {
+  timerId = null
+})
 const currencyList = ref([])
 const getCurrencys = async () => {
   const data = await getCurrencyList(accountId.value) as any
@@ -114,7 +118,7 @@ const onClickSave = debounce(async() => {
     uni.showToast({
       title: '保存成功',
     })
-    setTimeout(() => {
+    timerId = setTimeout(() => {
       uni.hideToast()
       uni.navigateBack({
         delta: 1

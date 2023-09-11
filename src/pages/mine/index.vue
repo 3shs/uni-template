@@ -2,7 +2,7 @@
   <view class="main-page--container">
     <view class="property-container">
       <view class="title">总资产估值</view>
-      <view class="amount">9999.88</view>
+      <view class="amount">{{ capital || '-' }}</view>
     </view>
     <view class="nav-container">
       <view
@@ -20,6 +20,8 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
+import { onShow } from "@dcloudio/uni-app"
+import { getCapital } from "@/api/sc-api"
 interface Navs {
   name: string,
   icon: string,
@@ -37,6 +39,14 @@ const onClickOrder = (url: string) => {
     url
   })
 }
+const capital = ref()
+const getAllCapital = async () => {
+  const res = await getCapital()
+  capital.value = res
+}
+onShow(() => {
+  getAllCapital()
+})
 </script>
 <style lang="scss" scoped>
 .property-container {
