@@ -8,7 +8,7 @@
       "@/*": ["./src/*"]
     },
     "lib": ["esnext", "dom"],
-    "types": ["@dcloudio/types", "@tuniao/tnui-vue3-uniapp/global.d.ts"]
+    "types": ["@dcloudio/types", "src/uni_modules/tuniaoui/global.d.ts"]
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

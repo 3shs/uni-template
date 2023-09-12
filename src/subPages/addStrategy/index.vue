@@ -19,7 +19,18 @@
             <TnRadio label="HYM">箱体</TnRadio>
           </TnRadioGroup>
         </TnFormItem>
+        <TnFormItem label="全仓" prop="allIn">
+          <TnRadioGroup
+            v-model="formData.allIn"
+            border
+            active-color="#020202"
+            @change="(onChnageAllIn as Function)">
+            <TnRadio label="1" active-color="#62bc6e">是</TnRadio>
+            <TnRadio label="0" active-color="#e6517b">否</TnRadio>
+          </TnRadioGroup>
+        </TnFormItem>
         <TnFormItem
+          v-if="isShowOperateAmount"
           label="操作金额"
           prop="operateAmount">
           <TnInput
@@ -615,7 +626,7 @@ const formRules: FormRules = {
   ],
   k: [
     { required: true, message: '请选择K线趋势', trigger: ['blur', 'change'] },
-  ],
+  ]
 }
 
 
@@ -633,6 +644,9 @@ const isCYR = computed(() => {
 })
 const isHYM = computed(() => {
   return formData.type === 'HYM'
+})
+const isShowOperateAmount = computed(() => {
+  return formData.allIn === '0'
 })
 const accountId = ref('')
 onLoad((opt) => {
@@ -664,7 +678,8 @@ const formData = reactive({
   rate: '',
   k: '',
   back: '',
-  acctId: ''
+  acctId: '',
+  allIn: ''
 })
 
 const intervalForm = reactive<IntervalForm>({
@@ -787,6 +802,7 @@ const onChangeType = (value: string) => {
   } else {
     formData.closeCount = ''
   }
+  formData.allIn = ''
   formData.operateAmount = ''
   formData.rate = ''
   formData.k = ''
@@ -809,13 +825,13 @@ const onChangeType = (value: string) => {
 }
 
 const assignFormData = (data: any) => {
-  console.log(data)
   formData.id = data.tradeStrategy.id
   formData.type = data.tradeStrategy.type
   formData.instId = data.tradeStrategy.instId
   formData.posSide = data.tradeStrategy.posSide
   formData.status = data.tradeStrategy.status
   formData.closeCount = data.tradeStrategy.closeCount
+  formData.allIn = data.tradeStrategy.allIn
   formData.operateAmount = data.tradeStrategy.operateAmount
   formData.rate = data.tradeStrategy.rate
   formData.k = data.tradeStrategy.k
@@ -847,6 +863,13 @@ const onChangePosSide = (val: string) => {
       { type: 'STOP', start: '1.02', end: '', posSide: 'short' },
     ]
     }
+  }
+}
+
+
+const onChnageAllIn = (val: string) => {
+  if (val === '1') {
+    formData.operateAmount = ''
   }
 }
 

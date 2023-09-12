@@ -292,8 +292,12 @@ const getContent = computed(() => {
       value: formatEum(info.value.tradeStrategy.type)
     },
     {
+      label: '全仓',
+      value: info.value.tradeStrategy.allIn === '1' ? '是' : '否'
+    },
+    {
       label: '开仓金额',
-      value: info.value.tradeStrategy.operateAmount
+      value: info.value.tradeStrategy.operateAmount ? info.value.tradeStrategy.operateAmount : '-'
     },
     {
       label: '币种',

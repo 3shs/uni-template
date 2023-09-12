@@ -11,7 +11,8 @@
     <ScCard
       :title="item.lever + 'x'"
       v-for="(item, index) in leverageList"
-      :key="index">
+      :key="index"
+      @click="onClickItem(item)">
         <template #subHeader>
           <text :class="item.posSide === 'long' ? 'sc-success' : 'sc-danger'">
             {{ item.posSide === 'long' ? '做多' : '做空' }}
@@ -75,6 +76,13 @@ const onClickAdd = () => {
   console.log(111)
   uni.navigateTo({
     url: `/subPages/addLeverage/index?accountId=${accountId.value}`
+  })
+}
+
+const onClickItem = (row: Row) => {
+  const info = JSON.stringify(row)
+  uni.navigateTo({
+    url: `/subPages/addLeverage/index?accountId=${accountId.value}&info=${info}`
   })
 }
 </script>

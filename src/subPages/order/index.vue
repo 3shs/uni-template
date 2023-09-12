@@ -1,13 +1,20 @@
 <template>
   <view class="main-page--container">
-    <view class="order-card-container">
+    <z-paging
+      ref="paging"
+      v-model="orderList"
+      @query="queryList"
+      :paging-style="{
+        padding: '0 30rpx'
+      }"
+      :show-loading-more-no-more-line="false">
       <view
         class="order-card"
         v-for="(item, index) in orderList"
         @click="onClickOrder(item)">
         <view class="top flex-c-b f-w-500">
-          <view class="left">{{ getType(item.strategyType )}}</view>
-          <view :class="['right', getClass(item.orderType)]">{{ getOrderType(item.orderType) }}</view>
+          <view class="left">{{ getType(item.strategyType )}} <text class="sc-rich">{{ item.acctName }}</text></view>
+          <view :class="['right', getClass(item.orderState)]">{{ getOrderType(item.orderType) }}</view>
         </view>
         <view class="bottom">
           <view
@@ -19,7 +26,7 @@
           </view>
         </view>
       </view>
-    </view>
+    </z-paging>
   </view>
 </template>
 <script setup lang="ts">
@@ -35,28 +42,25 @@ interface Order {
   ordId: string
   px: string
   sz: string
+  orderState: string
+  acctName: string
 }
-
+const paging = ref()
 const orderList = ref<Order[]>([])
 
 onShow(() => {
-  getOrders()
+  // getOrders()
 })
-
-const getOrders = async () => {
-  uni.showLoading({
-    title: '加载中...'
-  })
-  const { records } = await getOrderList() as any
-  orderList.value = records
-  uni.hideLoading()
+const queryList = async (page: number, size: number) => {
+  const { records } = await getOrderList(page, size) as any
+  paging.value.complete(records)
 }
 
 const getClass = computed(() => {
   return (type: string) => {
-    if (type === 'PROFIT') {
+    if (type === 'ING') {
       return 'sc-success'
-    } else if (type === 'STOP') {
+    } else if (type === 'CLOSE') {
       return 'sc-danger'
     }
   }
@@ -117,25 +121,20 @@ const onClickOrder = (row: Order) => {
 }
 </script>
 <style lang="scss" scoped>
-  .order-card-container {
-      .order-card {
-        width: 100%;
-        border-bottom: 1px solid #f3f2f3;
-        padding: 20rpx 0;
-        .top {
-          color: #020202;
-          font-size: 30rpx;
-          .right {
-            color: $sc-btc-color;
-          }
-        }
-        .sub-itm {
-          color: $sc-sub-font-color;
-          font-size: 24rpx;
-          .label {
-            width: 118rpx;
-          }
-        }
+  .order-card {
+    width: 100%;
+    border-bottom: 1px solid #f3f2f3;
+    padding: 20rpx 0;
+    .top {
+      color: #020202;
+      font-size: 30rpx;
+    }
+    .sub-itm {
+      color: $sc-sub-font-color;
+      font-size: 24rpx;
+      .label {
+        width: 118rpx;
       }
+    }
   }
 </style>

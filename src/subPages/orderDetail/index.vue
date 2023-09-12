@@ -16,30 +16,54 @@
         </view>
       </template>
     </ScCard>
-    <ScTitle title="关联信息" :customStyle="{marginBottom: '30rpx'}"></ScTitle>
-    <ScCard
-      :title="getType(item.strategyType )"
-      v-for="(item, index) in info.details"
-      :key="index">
-      <template #subHeader>
-        <view :class="['right', getClass(item.orderType)]">{{ getOrderType(item.orderType) }}</view>
-      </template>
-      <template #content>
-        <view
-          class="sc-card-content-label-value"
-          v-for="(ele, i) in getRelatContent(item)"
-          :key="i">
-          <view class="label">{{ ele.label }}</view>
-          <view class="value">{{ ele.value }}</view>
-        </view>
-      </template>
-    </ScCard>
+    <template v-if="info.details && info.details.length > 0">
+      <ScTitle title="关联信息" :customStyle="{marginBottom: '30rpx'}"></ScTitle>
+      <ScCard
+        :title="getType(item.strategyType )"
+        v-for="(item, index) in info.details"
+        :key="index">
+        <template #subHeader>
+          <view :class="['right', getClass(item.orderType)]">{{ getOrderType(item.orderType) }}</view>
+        </template>
+        <template #content>
+          <view
+            class="sc-card-content-label-value"
+            v-for="(ele, i) in getRelatContent(item)"
+            :key="i">
+            <view class="label">{{ ele.label }}</view>
+            <view class="value">{{ ele.value }}</view>
+          </view>
+        </template>
+      </ScCard>
+    </template>
+    <template v-if="information">
+      <ScTitle title="仓位信息" :customStyle="{marginBottom: '30rpx'}"></ScTitle>
+      <ScCard
+        :title="information.pnl.slice(0, 8)"
+        :custom-main-title-style="{
+          color: information.pnl.includes('-') ? '#e6517b' : '#62bc6e'
+        }">
+        <template #subHeader>
+          <view :class="['right', getInformationClass(information.pnlRatio)]">{{ information.pnlRatio.slice(0, 8) }}</view>
+        </template>
+        <template #content>
+          <view
+            class="sc-card-content-label-value"
+            v-for="(ele, i) in getInfomationContent"
+            :key="i">
+            <view class="label">{{ ele.label }}</view>
+            <view class="value">{{ ele.value }}</view>
+          </view>
+        </template>
+      </ScCard>
+    </template>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { onLoad, onShow } from "@dcloudio/uni-app"
+import { getOrderDetail } from '@/api/sc-api'
 import ScCard from '../../components/ScCard/index.vue'
 import ScTitle from '../../components/ScTitle/index.vue'
 
@@ -82,8 +106,49 @@ const info = ref<Info>({
   updateTime: '',
   details: []
 })
+interface Information {
+  ctime: string
+  ccy: string
+  closeAvgPx: string
+  closeTotalPos: string
+  instId: string
+  lever: string
+  openAvgPx: string
+  openMaxPos: string
+  fee: string
+  pnl: string
+  pnlRatio: string
+  posId: string
+  direction: string
+  utime: string
+}
+const information = ref<Information>({
+  ctime: '',
+  ccy: '',
+  closeAvgPx: '',
+  closeTotalPos: '',
+  instId: '',
+  lever: '',
+  openAvgPx: '',
+  openMaxPos: '',
+  fee: '',
+  pnl: '',
+  pnlRatio: '',
+  posId: '',
+  direction: '',
+  utime: '',
+})
 onLoad((opt) => {
   info.value = JSON.parse(opt?.info)
+})
+
+const getDetail = async () => {
+  const res = await getOrderDetail(info.value.ordId) as any
+  info.value.details = res.details
+  information.value = res.tradePositionsHistory
+}
+onShow(() => {
+  getDetail()
 })
 
 const getType = computed(() => {
@@ -104,6 +169,16 @@ const getClass = computed(() => {
       return 'sc-success'
     } else if (type === 'STOP') {
       return 'sc-danger'
+    }
+  }
+})
+
+const getInformationClass = computed(() => {
+  return (type: string) => {
+    if (type.includes('-')) {
+      return 'sc-danger'
+    } else {
+      return 'sc-success'
     }
   }
 })
@@ -250,6 +325,51 @@ const getRelatContent = computed(() => {
       }
     ]
   }
+})
+
+const getInfomationContent = computed(() => {
+  return [
+    {
+      label: '平仓均价',
+      value: information.value.closeAvgPx
+    },
+    {
+      label: '平仓数量',
+      value: information.value.closeTotalPos
+    },
+    {
+      label: '币种',
+      value: information.value.instId
+    },
+    {
+      label: '杠杆',
+      value: information.value.lever
+    },
+    {
+      label: '开仓均价',
+      value: information.value.openAvgPx
+    },
+    {
+      label: '开仓数量',
+      value: information.value.openMaxPos
+    },
+    {
+      label: '手续费',
+      value: information.value.fee
+    },
+    {
+      label: '持仓方向',
+      value: information.value.direction === 'long' ? '做多' : '做空'
+    },
+    {
+      label: '开仓时间',
+      value: information.value.ctime
+    },
+    {
+      label: '平仓时间',
+      value: information.value.utime
+    },
+  ]
 })
 </script>
 <style lang="scss" scoped>

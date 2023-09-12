@@ -92,6 +92,7 @@ defineExpose({
               :class="ns.e('content-item')"
             >
               {{ dItem['label'] }}
+              <text v-if="props.otherKey">【{{ dItem['otherLabel'] }}】</text>
             </view>
           </picker-view-column>
         </picker-view>

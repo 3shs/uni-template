@@ -19,6 +19,7 @@ type PickerData = Array<Array<PickerDataItem>>
 interface PickerDataItem {
   label: string | number
   value: string | number
+  otherLabel: string | number
   originalData: any
   children?: Array<PickerDataItem>
 }
@@ -66,20 +67,23 @@ export const usePicker = (props: PickerProps) => {
   // 生成指定格式的数据
   const _generateData = (
     data: PickerDataType
-  ): Pick<PickerDataItem, 'label' | 'value' | 'originalData'> => {
+  ): Pick<PickerDataItem, 'label' | 'value' | 'otherLabel' | 'originalData'> => {
     if (isObject(data)) {
       return {
         label: data[props.labelKey],
         value: data[props.valueKey],
+        otherLabel: data[props.otherKey],
         originalData: {
           [props.labelKey]: data[props.labelKey],
           [props.valueKey]: data[props.valueKey],
+          [props.otherKey]: data [props.otherKey]
         },
       }
     } else {
       return {
         label: data as string | number,
         value: data as string | number,
+        otherLabel: data as string | number,
         originalData: data,
       }
     }
@@ -157,7 +161,7 @@ export const usePicker = (props: PickerProps) => {
         })
       } else {
         indexValue = [
-          pickerData.value[0].findIndex(
+          pickerData?.value[0]?.findIndex(
             (item) => item.value === props.modelValue
           ),
         ]

@@ -59,6 +59,10 @@ export const pickerProps = buildProps({
     type: String,
     default: 'children',
   },
+  otherKey: {
+    type: String,
+    default: ''
+  }
 })
 
 export const pickerEmits = {
