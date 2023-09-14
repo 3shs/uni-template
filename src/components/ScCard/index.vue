@@ -4,7 +4,9 @@
     :style="customStyle"
     @click="onClikcCard">
     <view class="sc-card-title">
-      <view class="left">
+      <view
+        class="left"
+        :style="customMainTitleStyle">
         {{ title }}
       </view>
       <view class="right">
@@ -19,7 +21,8 @@
 <script setup lang="ts">
 const props = defineProps({
   title: String,
-  customStyle: Object
+  customStyle: Object,
+  customMainTitleStyle: Object
 })
 
 const emit = defineEmits(['click'])

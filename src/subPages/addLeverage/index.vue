@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { onShow, onLoad, onUnload } from "@dcloudio/uni-app"
-import { getCurrencyList, createLeverage } from "@/api/sc-api"
+import { getCurrencyList, createLeverage, updateLeverage } from "@/api/sc-api"
 import ScTitle from '@/components/ScTitle/index.vue'
 import TnForm from '@/uni_modules/tuniaoui/components/form/src/form.vue'
 import TnFormItem from '@/uni_modules/tuniaoui/components/form/src/form-item.vue'
@@ -80,6 +80,7 @@ const formRules: FormRules = {
   ]
 }
 const formData = reactive({
+  id: '',
   acctId: '',
   lever: '',
   posSide: '',
@@ -90,7 +91,18 @@ const accountId = ref('')
 onLoad((opt) => {
   accountId.value = opt?.accountId
   formData.acctId = opt?.accountId
+  if (opt?.info) {
+    assignFormData(JSON.parse(opt.info))
+  } else {
+    formData.id = ''
+  }
 })
+const assignFormData = (data: any) => {
+  formData.id = data.id
+  formData.lever = data.lever
+  formData.posSide = data.posSide
+  formData.instId = data.instId
+}
 onShow(() => {
   getCurrencys()
 })
@@ -113,7 +125,8 @@ const onClickCurrency = () => {
 
 const onClickSave = debounce(async() => {
   await formRef.value?.validate()
-  const res = await createLeverage(formData) as any
+  const request = formData.id ? updateLeverage : createLeverage
+  const res = await request(formData) as any
   if (res) {
     uni.showToast({
       title: '保存成功',
