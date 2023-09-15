@@ -35,12 +35,25 @@ http.interceptors.response.use(response => { /* 请求之后拦截器。可以�
   // }
   return response.data
 }, response => { // 请求错误做点什么。可以使用async await 做异步操作
-  // console.log(response)
+  console.log(response)
   if (response.data.status === 500) {
     uni.showToast({
       icon: 'error',
       title: '阿星bug！！！！',
     })
+    return
+  }
+  if (response.statusCode === 401) {
+    uni.showToast({
+      icon: 'error',
+      title: '登陆过期～',
+    })
+    uni.clearStorage()
+    setTimeout(() => {
+      uni.navigateTo({
+        url: '/pages/login/index'
+      })
+    }, 1000)
     return
   }
   return Promise.reject(response)
