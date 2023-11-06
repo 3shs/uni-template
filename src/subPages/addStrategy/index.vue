@@ -82,7 +82,7 @@
         <TnFormItem
           label="分批止损次数"
           prop="closeCount"
-          v-if="isCYR || isFDM">
+          v-if="isCYR">
           <TnInput
             v-model.trim="formData.closeCount"
             placeholder="请输入分批止损次数">
@@ -134,8 +134,8 @@
             :key="i">
             <view class="left">
               <view class="fdm-tip flex-a-c" v-if="isFDM">
-                <view class="tip-left">突破线</view>
-                <view class="tip-right">输入价</view>
+                <view class="tip-left">实体K突破</view>
+                <view class="tip-right">最新价突破</view>
               </view>
               <view class="interval flex-c-b">
                 <view class="label">{{ isFDM ? '开仓价格' : '开仓区间' }}</view>
@@ -927,8 +927,8 @@ const onClickSave = debounce(async() => {
   font-size: 22rpx;
   justify-content: flex-end;
   .tip-right {
-    margin-left: 123rpx;
-    margin-right: 103rpx;
+    margin-left: 90rpx;
+    margin-right: 66rpx;
   }
 }
 </style>
