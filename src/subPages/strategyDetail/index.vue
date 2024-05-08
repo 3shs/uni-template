@@ -24,7 +24,7 @@
             class="sc-card-content-label-value flex-c-b"
             v-for="(ele, i) in info.open"
             :key="i">
-            <view class="left">
+            <view class="left" v-if="!isOPT">
               <view class="interval flex-c-b">
                 <view class="label">{{ isFDM ? '开仓价格' : '开仓区间' }}</view>
                 <view class="value flex-a-c">
@@ -37,6 +37,20 @@
                 <view class="label">开仓方向</view>
                 <view class="value">
                   {{ transformToText(ele.posSide) }}
+                </view>
+              </view>
+            </view>
+            <view class="left" v-else>
+              <view class="interval flex-c-b">
+                <view class="label">触发价</view>
+                <view class="value flex-a-c">
+                  <text>{{ ele.start }}</text>
+                </view>
+              </view>
+              <view class="interval flex-c-b">
+                <view class="label">最高价</view>
+                <view class="value flex-a-c">
+                  <text>{{ ele.end }}</text>
                 </view>
               </view>
             </view>
@@ -78,6 +92,7 @@
         </template>
       </ScCard>
       <ScCard
+        v-if="!isOPT"
         :custom-style="{
           boxShadow: 'none',
           border: '1px solid #e6e6e6',
@@ -91,7 +106,7 @@
             :key="i">
             <view class="left">
               <view class="interval flex-c-b">
-                <view class="label">{{isHYM ? '止损率' : '止损区间'}}</view>
+                <view class="label">{{isHYM ? '止损点' : '止损区间'}}</view>
                 <view class="value flex-a-c">
                   <text>{{ ele.start }}</text>
                   <text class="line" v-if="isCYR">-</text>
@@ -274,11 +289,15 @@ const isCYR = computed(() => {
 const isHYM = computed(() => {
   return info.value.tradeStrategy.type === 'HYM'
 })
-
+const isOPT = computed(() => {
+  return info.value.tradeStrategy.type === 'OPT' || info.value.tradeStrategy.type === 'OPT_FIGHT'
+})
 const accountId = ref('')
+const from = ref<string>('')
 onLoad((opt) => {
   info.value = JSON.parse( opt?.info)
   accountId.value = opt?.accountId
+  from.value = opt?.from
 })
 let timerId: any
 
@@ -286,48 +305,73 @@ onUnload(() => {
   timerId = null
 })
 const getContent = computed(() => {
-  return [
-    {
-      label: '策略',
-      value: formatEum(info.value.tradeStrategy.type)
-    },
-    {
-      label: '全仓',
-      value: info.value.tradeStrategy.allIn === '1' ? '是' : '否'
-    },
-    {
-      label: '开仓金额',
-      value: info.value.tradeStrategy.operateAmount ? info.value.tradeStrategy.operateAmount : '-'
-    },
-    {
-      label: '币种',
-      value: info.value.tradeStrategy.instId
-    },
-    {
-      label: '持仓方向',
-      value: formatEum(info.value.tradeStrategy.posSide)
-    },
-    {
-      label: '状态',
-      value: info.value.tradeStrategy.status ===  'ENABLE' ? '启用' : '停用'
-    },
-    {
-      label: '张数比',
-      value: info.value.tradeStrategy.rate
-    },
-    {
-      label: '分批止损次数',
-      value: info.value.tradeStrategy.closeCount ? info.value.tradeStrategy.closeCount : '-'
-    },
-    {
-      label: 'K线趋势',
-      value: info.value.tradeStrategy.k ? info.value.tradeStrategy.k : '-'
-    },
-    {
-      label: '反手开',
-      value: info.value.tradeStrategy.back === '1' ? '是' : '否'
-    }
-  ]
+  if (from.value === 'strategy') {
+    return [
+      {
+        label: '策略',
+        value: formatEum(info.value.tradeStrategy.type)
+      },
+      {
+        label: '全仓',
+        value: info.value.tradeStrategy.allIn === '1' ? '是' : '否'
+      },
+      {
+        label: '开仓金额',
+        value: info.value.tradeStrategy.operateAmount ? info.value.tradeStrategy.operateAmount : '-'
+      },
+      {
+        label: '币种',
+        value: info.value.tradeStrategy.instId
+      },
+      {
+        label: '持仓方向',
+        value: formatEum(info.value.tradeStrategy.posSide)
+      },
+      {
+        label: '八小时自动止盈',
+        value: info.value.tradeStrategy.eight ===  '1' ? '是' : '否'
+      },
+      {
+        label: '状态',
+        value: info.value.tradeStrategy.status ===  'ENABLE' ? '启用' : '停用'
+      },
+      {
+        label: '张数比',
+        value: info.value.tradeStrategy.rate
+      },
+      {
+        label: '分批止损次数',
+        value: info.value.tradeStrategy.closeCount ? info.value.tradeStrategy.closeCount : '-'
+      },
+      {
+        label: 'K线趋势',
+        value: info.value.tradeStrategy.k ? info.value.tradeStrategy.k : '-'
+      },
+      {
+        label: '反手开',
+        value: info.value.tradeStrategy.back === '1' ? '是' : '否'
+      }
+    ]
+  } else {
+    return [
+      {
+        label: '策略',
+        value: formatEum(info.value.tradeStrategy.type)
+      },
+      {
+        label: '币种',
+        value: info.value.tradeStrategy.instId
+      },
+      {
+        label: '开仓金额',
+        value: info.value.tradeStrategy.operateAmount ? info.value.tradeStrategy.operateAmount : '-'
+      },
+      {
+        label: '行权价',
+        value: info.value.tradeStrategy.openInstId ? info.value.tradeStrategy.openInstId : '-'
+      },
+    ]
+  }
 })
 
 const updateStatus = async () => {
@@ -395,8 +439,11 @@ const onClickStatus = () => {
 }
 const onClickEdit = () => {
   const detail = JSON.stringify(info.value)
+  const url = from.value === 'strategy' ?
+  `/subPages/addStrategy/index?accountId=${accountId.value}&info=${detail}` :
+  `/subPages/addOptions/index?accountId=${accountId.value}&info=${detail}`
   uni.navigateTo({
-    url: `/subPages/addStrategy/index?accountId=${accountId.value}&info=${detail}`
+    url
   })
 }
 </script>

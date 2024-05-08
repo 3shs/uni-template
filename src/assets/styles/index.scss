@@ -35,6 +35,9 @@
   justify-content: center;
   align-items: center;
 }
+.flex {
+  display: flex;
+}
 .f-w-100 {
   font-weight: 100;
 }
@@ -64,4 +67,10 @@
 }
 .f-w-bold {
   font-weight: bold;
+}
+.m-b-5 {
+  margin-bottom: 5px;
+}
+.m-t-10 {
+  margin-top: 10px;
 }

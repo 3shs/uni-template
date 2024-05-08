@@ -59,18 +59,25 @@ interface Row {
   tradeStrategy: TradeStrategy
 }
 
-const accountId = ref('')
-const title = ref('')
+const accountId = ref<string>('')
+const title = ref<string>('')
+const from = ref<string>('')
+
 
 onLoad((opt) => {
   accountId.value = opt?.id
   title.value = opt?.title
+  from.value = opt?.from
 })
 
 const strategyList = ref<Strategy[]>([])
+const isOpt = ['OPT_FIGHT', 'OPT']
 onShow(async ()=> {
   const data = await getTradeStrategyList({acctId: accountId.value}) as any
-  strategyList.value = data
+  const target = data.filter((ele: any) =>
+    from.value === 'strategy' ? !isOpt.includes(ele.tradeStrategy.type) : isOpt.includes(ele.tradeStrategy.type)
+  )
+  strategyList.value = target
 })
 
 const getContent = computed(() => {
@@ -109,20 +116,27 @@ const formatTitle = computed(() => {
       return '突破'
     } else if (type === 'HYM') {
       return '箱体'
+    } else if (type === 'OPT_FIGHT') {
+      return '短线期权'
+    } else if (type === 'OPT') {
+      return '期权'
     }
   }
 })
 
 const onClickAdd = () => {
+  const url = from.value === 'strategy' ?
+  `/subPages/addStrategy/index?accountId=${accountId.value}` :
+  `/subPages/addOptions/index?accountId=${accountId.value}`
   uni.navigateTo({
-    url: `/subPages/addStrategy/index?accountId=${accountId.value}`
+    url
   })
 }
 
 const onclickRow = (row: Strategy) => {
   const info = JSON.stringify(row)
   uni.navigateTo({
-    url: `/subPages/strategyDetail/index?accountId=${accountId.value}&info=${info}`
+    url: `/subPages/strategyDetail/index?accountId=${accountId.value}&info=${info}&from=${from.value}`
   })
 }
 

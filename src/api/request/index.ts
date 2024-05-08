@@ -56,6 +56,13 @@ http.interceptors.response.use(response => { /* 请求之后拦截器。可以�
     }, 1000)
     return
   }
+  if (response.statusCode === 500) {
+    uni.showToast({
+      icon: 'error',
+      title: response.data || '阿星bug！！！',
+    })
+    return
+  }
   return Promise.reject(response)
 })
 

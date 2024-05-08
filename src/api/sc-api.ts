@@ -8,7 +8,7 @@ export const getOrderList = (page: number, size: number) => http.post(`/api/trad
 
 export const getCurrencyList = (id: string) => http.get(`/api/trade-strategy/SWAP/product?acctId=${id}`)
 
-export const getAccountBalance = (id: string) => http.get(`/api/trade-acct/balance?acctId=${id}`)
+export const getAccountBalance = (id: string, instId: string = 'USDT') => http.get(`/api/trade-acct/balance?acctId=${id}&instId=${instId}`)
 
 export const createStrategy = (data: object) => http.post(`/api/trade-strategy`, data)
 
@@ -31,3 +31,6 @@ export const closePosition = (id: number | null) => http.post(`/api/trade-order/
 export const pullTheBrake = () => http.post(`/api/trade-order/pullSwitch`)
 
 export const getOrderDetail = (id: string) => http.get(`/api/trade-order/${id}/detail`)
+
+export const getProduct = (acctId: string, instId: string) => http.get(`/api/trade-strategy/opt/product?acctId=${acctId}&instId=${instId}`)
+

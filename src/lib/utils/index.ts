@@ -36,6 +36,8 @@ interface ScEum {
   ENABLE: string
   UNABLE: string
   'long,short': string
+  OPT: string
+  OPT_FIGHT: string
 }
 
 const SC_EUM: ScEum = {
@@ -46,7 +48,9 @@ const SC_EUM: ScEum = {
   short: '做空',
   ENABLE: '启用',
   UNABLE: '停用',
-  "long,short": '多空双开'
+  "long,short": '多空双开',
+  OPT: '期权',
+  OPT_FIGHT: '短线期权'
 }
 
 export function formatEum(type: keyof ScEum) {

@@ -5,18 +5,25 @@
         class="sc-account-menu-item"
         v-for="(item, index) in menus"
         :key="index"
-        @click="onClickMenuItem(item.url)">
+        @click="onClickMenuItem(item)">
         <view class="icon">
           <text :class="`iconfont' ${item.icon}`"></text>
         </view>
         <view class="name f-w-500">{{ item.title }}</view>
       </view>
     </view>
+    <view class="account-name sc-rich f-w-800 flex-j-c m-t-10">{{ title }}</view>
   </view>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import { onShow, onLoad } from "@dcloudio/uni-app"
+
+interface Row {
+  icon: string
+  title: string
+  url: string
+}
 
 const menus = ref([
   {
@@ -28,6 +35,11 @@ const menus = ref([
     icon: 'icon-jiqiren',
     title: '策略',
     url: '/subPages/strategy/index'
+  },
+  {
+    icon: 'icon-level',
+    title: '期权',
+    url: '/subPages/strategy/index'
   }
 ])
 const accountId = ref('')
@@ -38,9 +50,10 @@ onLoad((opt) => {
   title.value = opt?.title
 })
 
-const onClickMenuItem = (url: string) => {
+const onClickMenuItem = (row: Row) => {
+  const from = row.title === '策略' ? 'strategy' : 'options'
   uni.navigateTo({
-    url: `${url}?id=${accountId.value}&title=${title.value}`
+    url: `${row.url}?id=${accountId.value}&title=${title.value}&from=${from}`
   })
 }
 </script>

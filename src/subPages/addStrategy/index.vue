@@ -63,6 +63,35 @@
             </TnRadio>
           </TnRadioGroup>
         </TnFormItem>
+        <TnFormItem
+          label="做多杠杆"
+          prop="longLeverage"
+          v-if="formData.posSide === 'long' || formData.posSide === 'long,short'">
+          <TnInput
+            v-model="formData.longLeverage"
+            placeholder="请输入">
+          </TnInput>
+        </TnFormItem>
+        <TnFormItem
+          label="做空杠杆"
+          prop="shortLeverage"
+          v-if="formData.posSide === 'short' || formData.posSide === 'long,short'">
+          <TnInput
+            v-model="formData.shortLeverage"
+            placeholder="请输入">
+          </TnInput>
+        </TnFormItem>
+        <TnFormItem
+          label="八小时自动止盈"
+          prop="eight"
+          v-if="isHYM">
+          <TnRadioGroup
+            v-model="formData.eight"
+            border>
+            <TnRadio label="1" active-color="#62bc6e">是</TnRadio>
+            <TnRadio label="0" active-color="#e6517b">否</TnRadio>
+          </TnRadioGroup>
+        </TnFormItem>
         <TnFormItem label="状态" prop="status">
           <TnRadioGroup
             v-model="formData.status"
@@ -282,7 +311,7 @@
             :key="i">
             <view class="left">
               <view class="interval flex-c-b">
-                <view class="label">{{isHYM ? '止损率' : '止损区间'}}</view>
+                <view class="label">{{isHYM ? '止损点' : '止损区间'}}</view>
                 <view class="value flex-a-c">
                   <TnInput
                     size="sm"
@@ -615,6 +644,9 @@ const formRules: FormRules = {
   posSide: [
     { required: true, message: '请选择持仓方向', trigger: ['blur', 'change'] },
   ],
+  eight: [
+    { required: true, message: '请选择八小时自动止盈', trigger: ['blur', 'change'] },
+  ],
   status: [
     { required: true, message: '请选择状态', trigger: ['blur', 'change'] },
   ],
@@ -626,7 +658,13 @@ const formRules: FormRules = {
   ],
   k: [
     { required: true, message: '请选择K线趋势', trigger: ['blur', 'change'] },
-  ]
+  ],
+  longLeverage: [
+    { required: true, message: '请输入杠杆', trigger: ['blur', 'change'] },
+  ],
+  shortLeverage: [
+    { required: true, message: '请输入杠杆', trigger: ['blur', 'change'] },
+  ],
 }
 
 
@@ -679,7 +717,10 @@ const formData = reactive({
   k: '',
   back: '',
   acctId: '',
-  allIn: ''
+  allIn: '',
+  longLeverage: 10,
+  shortLeverage: 10,
+  eight: ''
 })
 
 const intervalForm = reactive<IntervalForm>({
@@ -794,6 +835,7 @@ const onChangeType = (value: string) => {
   formData.type = value
   formData.instId = ''
   formData.posSide = ''
+  formData.eight = ''
   formData.status = 'UNABLE'
   if (value === 'CYR') {
     formData.closeCount = '1'
@@ -807,14 +849,16 @@ const onChangeType = (value: string) => {
   formData.rate = ''
   formData.k = ''
   formData.back = ''
+  formData.longLeverage = 10
+  formData.shortLeverage = 10
   formData.acctId = accountId.value
   intervalForm.tradeStrategyId = ''
   intervalForm.open = [{ type: 'OPEN', start: '', end: '', posSide: '' }]
   intervalForm.profit = [{ type: 'PROFIT', start: '', end: '', posSide: '' }]
   if (value === 'HYM') {
     intervalForm.stop = [
-      { type: 'STOP', start: '0.98', end: '', posSide: 'long' },
-      { type: 'STOP', start: '1.02', end: '', posSide: 'short' },
+      { type: 'STOP', start: '', end: '', posSide: 'long' },
+      { type: 'STOP', start: '', end: '', posSide: 'short' },
     ]
   } else {
     intervalForm.stop = [{ type: 'STOP', start: '', end: '', posSide: '' }]
@@ -829,6 +873,7 @@ const assignFormData = (data: any) => {
   formData.type = data.tradeStrategy.type
   formData.instId = data.tradeStrategy.instId
   formData.posSide = data.tradeStrategy.posSide
+  formData.eight = data.tradeStrategy.eight
   formData.status = data.tradeStrategy.status
   formData.closeCount = data.tradeStrategy.closeCount
   formData.allIn = data.tradeStrategy.allIn
@@ -837,6 +882,8 @@ const assignFormData = (data: any) => {
   formData.k = data.tradeStrategy.k
   formData.back = data.tradeStrategy.back
   formData.acctId = data.tradeStrategy.acctId
+  formData.longLeverage = data.tradeStrategy.longLeverage
+  formData.shortLeverage = data.tradeStrategy.shortLeverage
   intervalForm.open = data.open
   intervalForm.profit = data.profit
   intervalForm.stop = data.stop
@@ -855,13 +902,13 @@ const onChangePosSide = (val: string) => {
     intervalForm.backStop[0].posSide = val === 'long' ? 'short' : 'long'
   } else {
     if (val !== 'long,short') {
-      const start = val === 'long' ? '0.98' : '1.02'
+      const start = val === 'long' ? '' : ''
       intervalForm.stop = [{ type: 'STOP', start, end: '', posSide: val }]
     } else {
       intervalForm.stop = [
-      { type: 'STOP', start: '0.98', end: '', posSide: 'long' },
-      { type: 'STOP', start: '1.02', end: '', posSide: 'short' },
-    ]
+        { type: 'STOP', start: '', end: '', posSide: 'long' },
+        { type: 'STOP', start: '', end: '', posSide: 'short' },
+      ]
     }
   }
 }
@@ -876,6 +923,7 @@ const onChnageAllIn = (val: string) => {
 const onClickSave = debounce(async() => {
   await formRef.value?.validate()
   const res = await createStrategy(formData) as any
+  if(!res) return
   intervalForm.tradeStrategyId = res
   const resp = await createInterval(intervalForm) as any
   if (resp === 'S') {

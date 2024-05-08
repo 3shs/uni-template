@@ -42,6 +42,12 @@
           }
         },
         {
+          "path": "addOptions/index",
+          "style": {
+            "navigationBarTitleText": "配置期权"
+          }
+        },
+        {
           "path": "accountMenu/index",
           "style": {
             "navigationBarTitleText": "功能"
